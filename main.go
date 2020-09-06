@@ -27,27 +27,27 @@ type AppConfig struct {
 func main() {
 	r := raspi.NewAdaptor()
 	// 初期状態の取得
-	isRain, _ := r.DigitalRead("12")
+	isNotRain, _ := r.DigitalRead("12")
 	sensor := gpio.NewPIRMotionDriver(r, "12")
 
 	work := func() {
-		// センサOnになったら
+		// センサOn
 		sensor.On(gpio.MotionDetected, func(data interface{}) {
 			fmt.Println(gpio.MotionDetected)
 
-			if isRain == Off {
+			if isNotRain == Off {
 				fmt.Println("sensor on")
 			}
-			isRain = On
+			isNotRain = On
 		})
 
-		// センサOffになったら
+		// センサOff
 		sensor.On(gpio.MotionStopped, func(data interface{}) {
 			fmt.Println(gpio.MotionStopped)
-			if isRain == On {
+			if isNotRain == On {
 				fmt.Println("sensor off")
 			}
-			isRain = Off
+			isNotRain = Off
 		})
 
 	}

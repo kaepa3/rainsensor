@@ -1,2 +1,2 @@
-
-scp -p rainsensor pi@$1:/home/pl
+#!/bin/sh
+scp -p rainsensor pi@"$1":/home/pl
