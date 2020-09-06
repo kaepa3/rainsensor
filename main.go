@@ -1,6 +1,11 @@
 package main
 
 import (
+	"os"
+
+	"github.com/BurntSushi/toml"
+	"github.com/ashwanthkumar/slack-go-webhook"
+
 	"fmt"
 
 	"gobot.io/x/gobot"
@@ -12,6 +17,12 @@ const (
 	On  = 1
 	Off = 0
 )
+
+var conf AppConfig
+
+type AppConfig struct {
+	WebhookURL string
+}
 
 func main() {
 	r := raspi.NewAdaptor()
@@ -48,4 +59,33 @@ func main() {
 	)
 
 	robot.Start()
+}
+func readConfig() bool {
+	path := "config.toml"
+	if !Exists(path) {
+		return false
+	}
+
+	toml.DecodeFile("config.toml", &conf)
+	return true
+}
+func slacker(text string) {
+	if readConfig() {
+		payload := slack.Payload{
+			Text:      text,
+			Username:  "robot",
+			Channel:   "#general",
+			IconEmoji: ":monkey_face:",
+		}
+		err := slack.Send(conf.WebhookURL, "", payload)
+		if len(err) > 0 {
+			fmt.Printf("error: %s\n", err)
+		}
+	}
+
+}
+
+func Exists(filename string) bool {
+	_, err := os.Stat(filename)
+	return err == nil
 }
